@@ -4,13 +4,9 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Trash2, Edit, Plus, Save, Check, X, GripVertical } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Checkbox } from "@/app/components/ui/checkbox"
+import { TodoItem } from '../types/todo';
+import { useAppContext } from '../context/AppContext';
 
-interface TodoItem {
-  id: number;
-  text: string;
-  completed: boolean;
-  isEditing?: boolean;
-}
 interface DraggableTodoProps extends TodoItem {
   index: number;
   moveTodo: (fromIndex: number, toIndex: number) => void;
@@ -63,9 +59,10 @@ const DraggableTodo: React.FC<DraggableTodoProps> = ({ id, text, completed, isEd
           <span className={cn('w-full px-2', completed ? 'line-through' : '')}>
             {text}
           </span>
+          {!completed &&
           <button className='bg-orange-600 rounded-md text-white p-1 hover:bg-opacity-60' onClick={() => props.handleEditTodo && props.handleEditTodo(id)}>
             <Edit size={18} />
-          </button>
+          </button>}
           <button className='bg-red-600 rounded-md text-white p-1 hover:bg-opacity-60' onClick={() => props.handleRemoveTodo && props.handleRemoveTodo(id)}>
             <Trash2 size={18} />
           </button>
@@ -76,26 +73,20 @@ const DraggableTodo: React.FC<DraggableTodoProps> = ({ id, text, completed, isEd
 };
 
 const Todo: React.FC = () => {
-  const [todos, setTodos] = useState<TodoItem[]>(() => {
-    let value: TodoItem[] = [];
-    if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem("todos");
-    
-      if (saved !== null) {
-        value = JSON.parse(saved);
-      }
-    }
-    return value;
-  });
   const [domLoaded, setDomLoaded] = useState<boolean>(false);
-
+  const {todoContext, settingsContext} = useAppContext();
+  const {settings} = settingsContext
+  const {todos, setTodos} = todoContext;
   useEffect(() => {
     setDomLoaded(true);
   }, []);
 useEffect(() => {
+  if(settings.tasks.removeCompleted){
+    setTodos((prevTodos) => prevTodos.filter((todo) => !todo.completed));
+  }
   sessionStorage.setItem('todos', JSON.stringify(todos));
-}, [todos]);
-    
+}, [setTodos, settings, todos]);
+
 const handleAddTodo = () => {
   setTodos([{ id: Date.now(), text: '', completed: false, isEditing: true },...todos]);
 };
@@ -135,14 +126,19 @@ const handleSaveTodo = (id: number) => {
       )
   );
 };
-  const moveTodo = (fromIndex: number, toIndex: number) => {
-    const updatedTodos = [...todos];
-    const [removed] = updatedTodos.splice(fromIndex, 1);
-    updatedTodos.splice(toIndex, 0, removed);
-    setTodos(updatedTodos);
-  };
+const moveTodo = (fromIndex: number, toIndex: number) => {
+  const updatedTodos = [...todos];
+  const [removed] = updatedTodos.splice(fromIndex, 1);
+  updatedTodos.splice(toIndex, 0, removed);
+  setTodos(updatedTodos);
+};
 
-
+const handleCompleteAll = () => {
+  setTodos((prevTodos) =>
+  prevTodos.map((todo) =>{
+    return { ...todo, completed: true }
+  }))
+}
   return (
     <DndProvider backend={HTML5Backend}>
       {domLoaded && (
@@ -153,7 +149,7 @@ const handleSaveTodo = (id: number) => {
               <button onClick={handleAddTodo} className='flex flex-row justify-center items-center gap-2 py-2 px-4 rounded-md cursor-pointer transition duration-300 bg-[#ffb88c] hover:bg-[#de6262] text-white font-bold shadow-lg'>
                 <Plus size={20} /> Add Task
               </button>
-              <button onClick={handleAddTodo} className='flex flex-row justify-center items-center gap-2 py-2 px-4 rounded-md cursor-pointer transition duration-300 bg-green-400 hover:bg-green-600 text-white font-bold shadow-lg'>
+              <button onClick={handleCompleteAll} className='flex flex-row justify-center items-center gap-2 py-2 px-4 rounded-md cursor-pointer transition duration-300 bg-green-400 hover:bg-green-600 text-white font-bold shadow-lg'>
                 <Check size={20} /> Complete all
               </button>
             </div>

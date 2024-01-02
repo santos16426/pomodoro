@@ -1,7 +1,7 @@
 import { cn } from '@/app/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Square, TimerReset } from 'lucide-react';
-
+import { useAppContext } from '../context/AppContext';
 type TimerType = {
     id: number,
     type: string,
@@ -27,21 +27,39 @@ const timer: TimerType[] = [
 ];
 
 const Pomodoro = () => {
-    const [activeTab, setActiveTab] = useState<number>(0);
-    const [timerValue, setTimerValue] = useState<number>(25 * 60); // Initial value in seconds
+    const [timerValue, setTimerValue] = useState<number>(25 * 60);
     const [isRunning, setIsRunning] = useState<boolean>(false);
+    const { settingsContext, todoContext, tabContext } = useAppContext();
+    const {activeTab, setActiveTab} = tabContext
+    const audioRef = useRef<HTMLAudioElement |null>(null);
+    const volume = settingsContext.settings.sounds.volume/100;
     const tabs: string[] = [
         "Pomodoro",
         "Short Break",
         "Long Break"
     ];
     useEffect(() => {
-        setTimerValue(timer[activeTab].value * 60); 
-    }, [activeTab]);
+        const savedSettings = sessionStorage.getItem("settings");
+        if (savedSettings) {
+            const parsedSettings = JSON.parse(savedSettings);
+            const { timer: timerSettings } = parsedSettings;
+            let time = 25;
+            if(activeTab === 0){
+                time = timerSettings.pomodoro
+            }
+            if(activeTab === 1){
+                time = timerSettings.short
+            }
+            if(activeTab === 2){
+                time = timerSettings.long
+            }
+            setTimerValue(time * 60);
+            setIsRunning(false)
+        }
+    }, [activeTab,settingsContext]);
 
     useEffect(() => {
         let timerInterval: NodeJS.Timeout;
-
         if (isRunning && timerValue > 0) {
             timerInterval = setInterval(() => {
                 setTimerValue(prevValue => prevValue - 1);
@@ -49,18 +67,44 @@ const Pomodoro = () => {
             
         }
         if(timerValue === 0){
-            alert("finish timer")
+            if(audioRef.current){
+                audioRef.current.src = settingsContext.settings.sounds.alarm;
+                audioRef.current.play();
+                (audioRef.current as any).volume = volume;
+            }
+            if(settingsContext.settings.tasks.autoComplete && activeTab === 0){
+                const currentTodos = todoContext.todos
+                todoContext.setTodos(currentTodos.map((todo)=>{
+                    return {...todo, completed:true}
+                }))
+                sessionStorage.setItem('todos', JSON.stringify(todoContext))
+            }
+            setIsRunning(false);
         }
 
         return () => clearInterval(timerInterval);
-    }, [isRunning, timerValue]);
-
+    }, [activeTab, isRunning, settingsContext.settings.sounds.alarm, settingsContext.settings.tasks.autoComplete, timerValue, todoContext, volume]);
+    useEffect(()=>{
+        audioRef.current = new Audio();
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = '';
+            }
+            audioRef.current = null;
+        }
+    },[])
     const handleStartPause = () => {
         setIsRunning(prevValue => !prevValue);
     };
 
     const handleReset = () => {
-        setTimerValue(timer[activeTab].value * 60);
+        const time:number = settingsContext.settings.timer[activeTab === 0 ? 'pomodoro': activeTab === 2 ? 'short' : 'long'];
+        console.log(time)
+        if(audioRef.current){
+            audioRef.current.pause();
+        }
+        setTimerValue(time * 60);
         setIsRunning(false);
     };
 
