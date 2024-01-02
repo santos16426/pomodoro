@@ -67,7 +67,7 @@ const Pomodoro = () => {
     
 
     return(
-        <div className='bg-white p-2 lg:p-5 rounded-2xl bg-opacity-40 lg:w-[500px] shadow-lg lg:min-h-[400px]'>
+        <div className='bg-white p-2 lg:p-5 rounded-2xl bg-opacity-40 w-full lg:w-[500px] shadow-lg lg:min-h-[400px]'>
             <div className='flex flex-row gap-4 px-2 justify-around py-2'>
             {tabs.map((tab, index) => (
                 <div
