@@ -78,6 +78,6 @@ $color2: #de6262;
   }
   body {
     background: linear-gradient(to bottom, $color1, $color2);
-    
+    background-size: cover;    
   }
 }

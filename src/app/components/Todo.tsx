@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, Edit, Plus, Save, Check, X } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { Checkbox } from "@/app/components/ui/checkbox"
 
 interface TodoItem {
     id: number;
@@ -76,7 +77,7 @@ const handleSaveTodo = (id: number) => {
 return (
   <>
     {domLoaded &&
-    <div className='bg-white resize p-5 rounded-2xl bg-opacity-40 w-[500px] shadow-lg relative h-[400px] overflow-hidden'>
+    <div className='bg-white w-full resize p-5 rounded-2xl bg-opacity-40 lg:w-[500px] shadow-lg relative lg:h-[400px] overflow-hidden'>
       <div className='w-full'>
         <p className='text-center text-2xl text-white font-bold'>Todo List</p>
         <div className='flex flex-row justify-between'>
@@ -89,7 +90,7 @@ return (
         </div>
         <div className='mt-5 flex flex-col w-full gap-2 h-[270px] overflow-y-auto'>
           {todos.map((todo, index) => (
-            <div key={index} className={cn('w-full flex flex-row gap-2 bg-white bg-opacity-40 rounded-lg p-2 hover:bg-opacity-60', todo.completed && 'bg-green-400')}>
+            <div key={index} className={cn('w-full flex flex-row gap-2 items-center bg-white bg-opacity-40 rounded-lg p-2 hover:bg-opacity-60', todo.completed && 'bg-green-400')}>
               {todo.isEditing ? (
               <>
                   <input
@@ -107,10 +108,9 @@ return (
               </>
               ) : (
               <>
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={todo.completed}
-                  onChange={() => handleToggleTodo(todo.id)}
+                  onCheckedChange={() => handleToggleTodo(todo.id)}
                 />
                 <span
                   className={cn('w-full px-2', todo.completed? 'line-through': '')}

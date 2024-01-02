@@ -67,8 +67,8 @@ const Pomodoro = () => {
     
 
     return(
-        <div className='bg-white p-5 rounded-2xl bg-opacity-40 w-[500px] shadow-lg min-h-[400px]'>
-            <div className='flex flex-row gap-4 px-2 justify-around'>
+        <div className='bg-white p-2 lg:p-5 rounded-2xl bg-opacity-40 lg:w-[500px] shadow-lg lg:min-h-[400px]'>
+            <div className='flex flex-row gap-4 px-2 justify-around py-2'>
             {tabs.map((tab, index) => (
                 <div
                     key={index}
@@ -84,7 +84,7 @@ const Pomodoro = () => {
                 </div>
             ))}
             </div>
-            <div className='text-[10rem] text-center font-bold text-white'>{Math.floor(timerValue / 60)}:{timerValue % 60 < 10 ? '0' : ''}{timerValue % 60}</div>
+            <div className='text-[8rem] lg:text-[10rem] text-center font-bold text-white'>{Math.floor(timerValue / 60)}:{timerValue % 60 < 10 ? '0' : ''}{timerValue % 60}</div>
             <div className="flex gap-4 flex-row justify-center mt-4">
                 <button
                     className={cn('text-white py-2 px-4 rounded-md transition duration-300  flex flex-col justify-center  items-center',

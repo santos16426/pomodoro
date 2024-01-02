@@ -1,4 +1,4 @@
-import { Cog, Timer } from "lucide-react"
+import { AudioLines, Cog, ListChecks, Timer, Volume, Volume2 } from "lucide-react"
 import {
     Dialog,
     DialogClose,
@@ -9,19 +9,20 @@ import { Separator } from "./ui/separator"
 import { Input } from "./ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Slider } from "./ui/slider"
+import { Checkbox } from "@/app/components/ui/checkbox"
 
 const Header = () =>{
     return(
-        <div className='fixed flex flex-col w-full justify-center px-[30rem] h-20 '>
-            <div className='flex flex-row justify-between w-full'>
+        <div className='fixed flex flex-col w-full h-20 p-4 lg:p-10'>
+            <div className='flex flex-row justify-between lg:justify-around w-full'>
                 <p className='text-3xl font-semibold text-white flex flex-row justify-center items-center gap-2 cursor-pointer'><Timer /> Pomodoro </p>
                 <Dialog>
-                    <DialogTrigger><p className='text-md font-semibold text-white flex flex-row justify-center items-center gap-2 cursor-pointer'>Settings<Cog />  </p></DialogTrigger>
+                    <DialogTrigger><p className='text-md font-semibold text-white flex flex-row justify-center items-center gap-2 cursor-pointer'>Settings<Cog className="w-8 h-8 lg:w-full lg:h-full"/></p></DialogTrigger>
                     <DialogContent className="w-full">
                         <p className="font-bold text-xl">Settings</p>
                         <p className="font-bold text-xs text-gray-400">Update your settings</p>
                         <Separator/>
-                        <div className="font-bold">Timer</div>
+                        <div className="font-bold flex flex-row gap-2 text-md items-center">Timer<Timer size={18} className="text-gray-500"/></div>
                         <div className="flex flex-row gap-5 w-full">
                             <div>
                                 <p className="text-sm text-gray-500 pb-2">Pomodoro</p>
@@ -38,7 +39,7 @@ const Header = () =>{
                         </div>
                         <Separator/>
                         <div>
-                            <div className="font-bold pb-3">Sounds</div>
+                            <div className="font-bold pb-3 flex flex-row gap-2 text-md items-center">Sounds <AudioLines size={18} className="text-gray-500"/></div>
                             <div className="flex flex-row gap-5">
                                 <div>
                                     <p className="text-sm text-gray-500 pb-2">Alarm Sounds</p>
@@ -55,7 +56,23 @@ const Header = () =>{
                                 </div>
                                 <div className="w-1/2">
                                     <p className="text-sm text-gray-500 pb-2">Volume</p>
-                                    <Slider className="w-full mt-3" defaultValue={[33]} max={100} step={1} />
+                                    <div className="flex flex-row justify-center gap-2 text-gray-500">
+                                        <Volume />
+                                        <Slider className="w-full" defaultValue={[33]} max={100} step={1} />
+                                        <Volume2 />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <Separator/>
+                        <div>
+                            <div className="font-bold pb-3 flex flex-row gap-2 text-md items-center">Task <ListChecks size={18} className="text-gray-500"/></div>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex flex-row gap-2 items-center">
+                                    <Checkbox/><p className="text-sm">Auto complete tasks</p>
+                                </div>
+                                <div className="flex flex-row gap-2 items-center">
+                                    <Checkbox/><p className="text-sm">Remove when complete</p>
                                 </div>
                             </div>
                         </div>
