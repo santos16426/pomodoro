@@ -74,9 +74,10 @@ $color2: #de6262;
     &::-webkit-scrollbar{
         display: none;
     }
+    font-family: Quicksand;
   }
   body {
     background: linear-gradient(to bottom, $color1, $color2);
-    font-family: Exo;
+    
   }
 }

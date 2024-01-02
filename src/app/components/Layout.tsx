@@ -3,6 +3,7 @@ import '@/app/styles/globals.scss';
 import { Quicksand } from 'next/font/google';
 import { cn } from '@/app/lib/utils';
 import Head from 'next/head';
+import Header from './Header';
 
 const quicksand = Quicksand({ subsets: ['latin'] });
 
@@ -18,6 +19,7 @@ const Layout = ({ children }: LayoutProps) => {
             </Head>
             <main className='relative flex flex-col min-h-screen'>
                 <div className='flex-grow flex-1'>
+                <Header/>
                 {children}
                 </div>
             </main>
