@@ -18,32 +18,14 @@ import { useAppContext } from "../context/AppContext"
 const Header:React.FC = () =>{
     const [domLoaded, setDomLoaded] = useState<boolean>(false);
     const { settingsContext } = useAppContext();
-    const [settings,setSettings] = useState<Settings>(()=>{
-        let value:Settings = {
-            timer:{
-                pomodoro: 25,
-                short: 5,
-                long: 10,
-            },
-            sounds:{
-                alarm: '/alarm/birds.mp3',
-                volume: 50,
-            },
-            tasks:{
-                autoComplete:false,
-                removeCompleted:false,
-            },
-        };
-        if(typeof window !== 'undefined'){
-            const saved = sessionStorage.getItem("settings");
-            if(saved !== null){
-                value = JSON.parse(saved);
-            }
-        }
-        return value;
-    })
+    const [tempSettings, setTempSettings] = useState<Settings|null>(null)
+    const {settings, setSettings} = settingsContext;
+    useEffect(()=>{
+        setTempSettings(settings)
+    },[settings])
     const handleChange = (parent:string,key:string,value:number|string|boolean):void =>{
-        setSettings((prevSettings) =>{
+        setTempSettings((prevSettings) =>{
+            if(prevSettings === null) return prevSettings
             const updatedSettings = {...prevSettings}
             if(parent === 'timer'){
                 updatedSettings.timer = {
@@ -67,8 +49,9 @@ const Header:React.FC = () =>{
         })
     }
     const handleSave = ()=>{
-        sessionStorage.setItem('settings', JSON.stringify(settings))
-        settingsContext.setSettings(settings)
+        console.log(tempSettings)
+        sessionStorage.setItem('settings', JSON.stringify(tempSettings))
+        if(tempSettings !== null) settingsContext.setSettings(tempSettings)
     }
     useEffect(() => {
         setDomLoaded(true);
@@ -90,7 +73,7 @@ const Header:React.FC = () =>{
                                 <p className="text-sm text-gray-500 pb-2">Pomodoro</p>
                                 <Input 
                                     type='number' 
-                                    value={settings.timer.pomodoro} 
+                                    value={tempSettings?.timer.pomodoro} 
                                     onChange={(e)=>handleChange('timer', 'pomodoro', e.target.value)}
                                 />
                             </div>
@@ -98,7 +81,7 @@ const Header:React.FC = () =>{
                                 <p className="text-sm text-gray-500 pb-2">Short Break</p>
                                 <Input 
                                     type='number' 
-                                    value={settings.timer.short} 
+                                    value={tempSettings?.timer.short} 
                                     onChange={(e)=>handleChange('timer', 'short', e.target.value)}
                                 />
                             </div>
@@ -106,7 +89,7 @@ const Header:React.FC = () =>{
                                 <p className="text-sm text-gray-500 pb-2">Long Break</p>
                                 <Input 
                                     type='number' 
-                                    value={settings.timer.long} 
+                                    value={tempSettings?.timer.long} 
                                     onChange={(e)=>handleChange('timer', 'long', e.target.value)}
                                 />
                             </div>
@@ -118,7 +101,7 @@ const Header:React.FC = () =>{
                                 <div>
                                     <p className="text-sm text-gray-500 pb-2">Alarm Sounds</p>
                                     <Select 
-                                        value={settings.sounds.alarm} 
+                                        value={tempSettings?.sounds.alarm} 
                                         onValueChange={e=>handleChange('sounds', 'alarm', e)}
                                     >
                                         <SelectTrigger className="w-[180px]">
@@ -137,7 +120,7 @@ const Header:React.FC = () =>{
                                     <p className="text-sm text-gray-500 pb-2">Volume</p>
                                     <div className="flex flex-row justify-center gap-2 text-gray-500">
                                         <Volume />
-                                        <Slider className="w-full" value={[settings.sounds.volume]} max={100} onValueChange={e=>handleChange('sounds','volume',e[0])}/>
+                                        <Slider className="w-full" value={[tempSettings? tempSettings.sounds.volume : 0]} max={100} onValueChange={e=>handleChange('sounds','volume',e[0])}/>
                                         <Volume2 />
                                     </div>
                                 </div>
@@ -149,12 +132,13 @@ const Header:React.FC = () =>{
                             <div className="flex flex-col gap-2">
                                 <div className="flex flex-row gap-2 items-center">
                                     <Checkbox
-                                        checked={settings.tasks.autoComplete}
+                                        checked={tempSettings?.tasks?.autoComplete}
                                         onCheckedChange={e=>handleChange('tasks', 'autoComplete',e)}
                                     /><p className="text-sm">Auto complete tasks</p>
                                 </div>
                                 <div className="flex flex-row gap-2 items-center">
                                     <Checkbox
+                                        checked={tempSettings?.tasks?.removeCompleted}
                                         onCheckedChange={e=>handleChange('tasks', 'removeCompleted',e)}
                                     /><p className="text-sm">Remove when complete</p>
                                 </div>

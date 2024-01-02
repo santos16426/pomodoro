@@ -27,10 +27,10 @@ const timer: TimerType[] = [
 ];
 
 const Pomodoro = () => {
-    const [activeTab, setActiveTab] = useState<number>(0);
     const [timerValue, setTimerValue] = useState<number>(25 * 60);
     const [isRunning, setIsRunning] = useState<boolean>(false);
-    const { settingsContext } = useAppContext();
+    const { settingsContext, todoContext, tabContext } = useAppContext();
+    const {activeTab, setActiveTab} = tabContext
     const audioRef = useRef<HTMLAudioElement |null>(null);
     const volume = settingsContext.settings.sounds.volume/100;
     const tabs: string[] = [
@@ -60,7 +60,6 @@ const Pomodoro = () => {
 
     useEffect(() => {
         let timerInterval: NodeJS.Timeout;
-
         if (isRunning && timerValue > 0) {
             timerInterval = setInterval(() => {
                 setTimerValue(prevValue => prevValue - 1);
@@ -73,19 +72,26 @@ const Pomodoro = () => {
                 audioRef.current.play();
                 (audioRef.current as any).volume = volume;
             }
+            if(settingsContext.settings.tasks.autoComplete && activeTab === 0){
+                const currentTodos = todoContext.todos
+                todoContext.setTodos(currentTodos.map((todo)=>{
+                    return {...todo, completed:true}
+                }))
+                sessionStorage.setItem('todos', JSON.stringify(todoContext))
+            }
             setIsRunning(false);
         }
 
         return () => clearInterval(timerInterval);
-    }, [isRunning, settingsContext.settings.sounds.alarm, timerValue, volume]);
+    }, [activeTab, isRunning, settingsContext.settings.sounds.alarm, settingsContext.settings.tasks.autoComplete, timerValue, todoContext, volume]);
     useEffect(()=>{
         audioRef.current = new Audio();
         return () => {
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current.src = '';
-              }
-              audioRef.current = null;
+            }
+            audioRef.current = null;
         }
     },[])
     const handleStartPause = () => {
