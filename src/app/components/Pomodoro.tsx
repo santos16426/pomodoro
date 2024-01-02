@@ -1,8 +1,7 @@
 import { cn } from '@/app/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Square, TimerReset } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-
 type TimerType = {
     id: number,
     type: string,
@@ -32,6 +31,8 @@ const Pomodoro = () => {
     const [timerValue, setTimerValue] = useState<number>(25 * 60);
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const { settingsContext } = useAppContext();
+    const audioRef = useRef<HTMLAudioElement |null>(null);
+    const volume = settingsContext.settings.sounds.volume/100;
     const tabs: string[] = [
         "Pomodoro",
         "Short Break",
@@ -53,6 +54,7 @@ const Pomodoro = () => {
                 time = timerSettings.long
             }
             setTimerValue(time * 60);
+            setIsRunning(false)
         }
     }, [activeTab,settingsContext]);
 
@@ -66,18 +68,37 @@ const Pomodoro = () => {
             
         }
         if(timerValue === 0){
-            alert("finish timer")
+            if(audioRef.current){
+                audioRef.current.src = settingsContext.settings.sounds.alarm;
+                audioRef.current.play();
+                (audioRef.current as any).volume = volume;
+            }
+            setIsRunning(false);
         }
 
         return () => clearInterval(timerInterval);
-    }, [isRunning, timerValue]);
-
+    }, [isRunning, settingsContext.settings.sounds.alarm, timerValue, volume]);
+    useEffect(()=>{
+        audioRef.current = new Audio();
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = '';
+              }
+              audioRef.current = null;
+        }
+    },[])
     const handleStartPause = () => {
         setIsRunning(prevValue => !prevValue);
     };
 
     const handleReset = () => {
-        setTimerValue(timer[activeTab].value * 60);
+        const time:number = settingsContext.settings.timer[activeTab === 0 ? 'pomodoro': activeTab === 2 ? 'short' : 'long'];
+        console.log(time)
+        if(audioRef.current){
+            audioRef.current.pause();
+        }
+        setTimerValue(time * 60);
         setIsRunning(false);
     };
 

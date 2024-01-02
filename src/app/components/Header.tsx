@@ -26,7 +26,7 @@ const Header:React.FC = () =>{
                 long: 10,
             },
             sounds:{
-                alarm: 'bird',
+                alarm: '/alarm/birds.mp3',
                 volume: 50,
             },
             tasks:{
@@ -125,9 +125,11 @@ const Header:React.FC = () =>{
                                             <SelectValue placeholder="Select alarm" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="bird">Birds</SelectItem>
-                                            <SelectItem value="wood">Wood</SelectItem>
-                                            <SelectItem value="nature">Nature</SelectItem>
+                                            <SelectItem value="/alarm/birds.mp3">Birds</SelectItem>
+                                            <SelectItem value="/alarm/forest.mp3">Forest</SelectItem>
+                                            <SelectItem value="/alarm/morning.mp3">Morning</SelectItem>
+                                            <SelectItem value="/alarm/upbeat.mp3">Up beat</SelectItem>
+                                            <SelectItem value="/alarm/waltz.mp3">Waltz</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

@@ -14,20 +14,29 @@ type AppProviderProps = {
 }
 
 export const AppProvider:React.FC<AppProviderProps> = ({children}) => {
-    const [settings, setSettings] = useState<Settings>({
-        timer:{
-            pomodoro: 25,
-            short: 5,
-            long: 10,
-        },
-        sounds:{
-            alarm: 'bird',
-            volume: 50,
-        },
-        tasks:{
-            autoComplete:false,
-            removeCompleted:false,
-        },
+    const [settings, setSettings] = useState<Settings>(()=>{
+        let value:Settings = {
+            timer:{
+                pomodoro: 25,
+                short: 5,
+                long: 10,
+            },
+            sounds:{
+                alarm: '/alarm/birds.mp3',
+                volume: 50,
+            },
+            tasks:{
+                autoComplete:false,
+                removeCompleted:false,
+            },
+        };
+        if(typeof window !== 'undefined'){
+            const saved = sessionStorage.getItem("settings");
+            if(saved !== null){
+                value = JSON.parse(saved);
+            }
+        }
+        return value;
     });
 
     const settingsContextValue = {
