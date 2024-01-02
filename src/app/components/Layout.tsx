@@ -21,8 +21,10 @@ const Layout = ({ children }: LayoutProps) => {
                 <div className='flex-grow flex-1'>
                 <Header/>
                 {children}
+                <div className='absolute bottom-0 w-full flex flex-row justify-center items-center text-white text-xs'>Copyright 2024 Billy Joe Santos</div>
                 </div>
             </main>
+            
         </div>
     );
 };
