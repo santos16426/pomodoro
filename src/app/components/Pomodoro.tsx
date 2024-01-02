@@ -1,6 +1,7 @@
 import { cn } from '@/app/lib/utils';
 import { useEffect, useState } from 'react';
 import { Play, Pause, Square, TimerReset } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 
 type TimerType = {
     id: number,
@@ -28,16 +29,32 @@ const timer: TimerType[] = [
 
 const Pomodoro = () => {
     const [activeTab, setActiveTab] = useState<number>(0);
-    const [timerValue, setTimerValue] = useState<number>(25 * 60); // Initial value in seconds
+    const [timerValue, setTimerValue] = useState<number>(25 * 60);
     const [isRunning, setIsRunning] = useState<boolean>(false);
+    const { settingsContext } = useAppContext();
     const tabs: string[] = [
         "Pomodoro",
         "Short Break",
         "Long Break"
     ];
     useEffect(() => {
-        setTimerValue(timer[activeTab].value * 60); 
-    }, [activeTab]);
+        const savedSettings = sessionStorage.getItem("settings");
+        if (savedSettings) {
+            const parsedSettings = JSON.parse(savedSettings);
+            const { timer: timerSettings } = parsedSettings;
+            let time = 25;
+            if(activeTab === 0){
+                time = timerSettings.pomodoro
+            }
+            if(activeTab === 1){
+                time = timerSettings.short
+            }
+            if(activeTab === 2){
+                time = timerSettings.long
+            }
+            setTimerValue(time * 60);
+        }
+    }, [activeTab,settingsContext]);
 
     useEffect(() => {
         let timerInterval: NodeJS.Timeout;
